@@ -2,14 +2,18 @@
 
 import { updateProfile } from "@/lib/actions";
 import { User } from "@prisma/client";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import ImageUploader from "./image-uploader";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function EditProfileForm({ user }: { user: User }) {
   const [uploadedImage, setUploadedImage] = useState({
     profileImage: user.profileImage,
     coverImage: user.coverImage,
   });
+
+  const router = useRouter();
 
   function handleUploadProfileImage(base64: string | null) {
     setUploadedImage((prevState) => {
@@ -29,6 +33,13 @@ export default function EditProfileForm({ user }: { user: User }) {
     updateProfileWithImage,
     undefined
   );
+
+  useEffect(() => {
+    if (formState?.success) {
+      toast.success("Profile updated successfully");
+      router.replace(`/${formState?.username}`);
+    }
+  }, [formState, router]);
 
   const inputClasses =
     "w-full p-4 text-lg text-white bg-black border-2 border-neutral-800 rounded-md outline-none focus:border-sky-500 transition disabled:bg-neutral-900 disabled:opacity-70 disabled:cursor-not-allowed";

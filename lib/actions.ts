@@ -185,8 +185,7 @@ export async function updateProfile(
     return { message: "Database Error: Failed to Update Profile." };
   }
 
-  revalidatePath(`/${username}`);
-  redirect(`/${username}`);
+  return { success: true, username };
 }
 
 export async function createPost(
@@ -219,7 +218,7 @@ export async function createPost(
     return { message: "Database Error: Failed to Create Post." };
   }
 
-  revalidatePath("/");
+  return { success: true };
 }
 
 export async function followUser(userId: string) {
@@ -495,5 +494,5 @@ export async function createComment(
     return { message: "Database Error: Failed to tweet reply." };
   }
 
-  revalidatePath(`/${postId}`);
+  return { success: true };
 }

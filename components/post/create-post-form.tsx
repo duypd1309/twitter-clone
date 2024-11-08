@@ -3,7 +3,9 @@
 import { createPost } from "@/lib/actions";
 import { User } from "@prisma/client";
 import Image from "next/image";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface CreatePostFormProps {
   user: User;
@@ -15,6 +17,14 @@ export default function CreatePostForm({ user }: CreatePostFormProps) {
     createPostWithUserId,
     undefined
   );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (formState?.success) {
+      toast.success("Tweet created!");
+      router.refresh();
+    }
+  }, [formState, router]);
 
   return (
     <div className="border-b-[1px] border-neutral-800 px-5 py-2">

@@ -1,9 +1,11 @@
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "long",
-});
+import { format, formatDistanceToNowStrict } from "date-fns";
 
 export function formatDate(date: Date | null | undefined): string {
   if (!date) return "N/A";
-  return dateFormatter.format(date);
+  return format(date, "MMMM yyyy"); // "MMMM" cho tên tháng đầy đủ, "yyyy" cho năm
+}
+
+export function formatRelativeTime(date: Date | null | undefined): string {
+  if (!date) return "N/A";
+  return formatDistanceToNowStrict(date, { addSuffix: true });
 }

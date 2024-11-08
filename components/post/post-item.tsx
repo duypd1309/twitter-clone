@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDate } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/utils";
 import { Comment, Post, User } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ export default function PostItem({
   );
 
   const createdAt = useMemo(() => {
-    return formatDate(data.createdAt);
+    return formatRelativeTime(data.createdAt);
   }, [data.createdAt]);
 
   return (
@@ -74,7 +74,9 @@ export default function PostItem({
             >
               @{data.user.username}
             </span>
-            <span className="text-neutral-500 text-sm">{createdAt}</span>
+            <span className="text-neutral-500 text-sm" suppressHydrationWarning>
+              {createdAt}
+            </span>
           </div>
 
           <div className="text-white mt-1">{data.body}</div>

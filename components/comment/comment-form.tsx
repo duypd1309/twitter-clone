@@ -2,7 +2,9 @@
 
 import { createComment } from "@/lib/actions";
 import Image from "next/image";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface CommentFormProps {
   postId: string;
@@ -18,6 +20,14 @@ export default function CommentForm({
     createCommentWithPostId,
     undefined
   );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (formState?.success) {
+      toast.success("Tweet replied!");
+      router.refresh();
+    }
+  }, [formState, router]);
 
   return (
     <div className="border-b-[1px] border-neutral-800 px-5 py-2">
