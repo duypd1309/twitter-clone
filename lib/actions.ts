@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcrypt from "bcrypt";
 import {
   getCurrentSession,
+  getPostById,
   getUserByEmailOrUsername,
   getUserById,
 } from "./dal";
@@ -285,6 +286,14 @@ export async function followUser(userId: string) {
     };
   }
 
+  // Create notification
+  try {
+    await createNotification("followed you.", userId, currentUserId);
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to create notification.");
+  }
+
   revalidatePath(`/${username}`);
   return { success: true, message: "Followed user successfully." };
 }
@@ -405,6 +414,14 @@ export async function likePost(postId: string) {
     };
   }
 
+  // Create notification
+  try {
+    await createNotification("liked your tweet.", post.userId, currentUserId);
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to create notification.");
+  }
+
   revalidatePath("/");
   return { success: true, message: "Liked post successfully." };
 }
@@ -494,5 +511,98 @@ export async function createComment(
     return { message: "Database Error: Failed to tweet reply." };
   }
 
+  // Create notification
+  const post = await getPostById(postId);
+  if (!post)
+    return {
+      sucess: true,
+      message: "Database Error: Cannot fetch data to create notification.",
+    };
+
+  try {
+    await createNotification(
+      "replied to your tweet.",
+      post.user.id,
+      currentUserId
+    );
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to create notification.");
+  }
+
   return { success: true };
+}
+
+export async function deletePost(postId: string) {
+  // Get current user id from session
+  const currentUserId = (await getCurrentSession())?.userId;
+
+  if (!currentUserId)
+    return { message: "Session Error: Cannot verify session." };
+
+  // Delete post in database
+  try {
+    await prisma.post.delete({
+      where: {
+        id: postId,
+        userId: currentUserId,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return { message: "Database Error: Failed to delete post." };
+  }
+
+  return { success: true };
+}
+
+export async function createNotification(
+  body: string,
+  userId: string,
+  senderId: string
+) {
+  if (userId === senderId) return;
+
+  try {
+    await prisma.notification.create({
+      data: {
+        body,
+        userId,
+        senderId,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to create notification.");
+  }
+
+  try {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hasNotification: true,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to update user notification.");
+  }
+}
+
+export async function turnOffNotification(userId: string) {
+  try {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hasNotification: false,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to update user notification.");
+  }
 }

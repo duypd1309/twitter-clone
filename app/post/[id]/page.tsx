@@ -22,10 +22,7 @@ export default async function PostPage({
   return (
     <>
       <Header showBackArror label="Tweet" />
-      <PostItem
-        data={post}
-        isLikedByCurrentUserId={post.likeIds.includes(currentUserId)}
-      />
+      <PostItem data={post} currentUserId={currentUserId} />
       <CommentForm
         postId={postId}
         userProfileImage={currentUser?.profileImage || "/placeholder.jpg"}

@@ -4,7 +4,7 @@ import SidebarLogo from "./sidebar-logo";
 import SidebarItem from "./sidebar-item";
 import { SidebarSignOutButton } from "./sidebar-signout-button";
 import { SidebarTweetButton } from "./sidebar-tweet-button";
-import { getCurrentSession } from "@/lib/dal";
+import { getCurrentSession, getUserById } from "@/lib/dal";
 
 export default async function Sidebar() {
   const iconProps = { color: "white", size: 24 };
@@ -19,6 +19,9 @@ export default async function Sidebar() {
       label: "Notifications",
       href: "/notifications",
       icon: <BsBellFill {...iconProps} />,
+      hasNotification: session
+        ? !!(await getUserById(session.userId))?.hasNotification
+        : false,
     },
     {
       label: "Profile",
@@ -37,6 +40,7 @@ export default async function Sidebar() {
               label={item.label}
               href={item.href}
               icon={item.icon}
+              hasNotification={item.hasNotification || false}
             />
           ))}
           <SidebarSignOutButton />

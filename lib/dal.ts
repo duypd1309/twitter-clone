@@ -206,3 +206,20 @@ export async function getComments(postId: string) {
     return null;
   }
 }
+
+export async function getNotifications(userId: string) {
+  try {
+    const notifications = await prisma.notification.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return notifications;
+  } catch (error) {
+    console.log("Error getting notifications:", error);
+    return null;
+  }
+}

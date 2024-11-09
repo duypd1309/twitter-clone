@@ -25,6 +25,10 @@ export default function RegisterModal() {
     router.replace("/login");
   }
 
+  function handleClose() {
+    router.back();
+  }
+
   const footerContent = (
     <div className="text-neutral-400 text-center mt-4">
       <p>
@@ -44,6 +48,7 @@ export default function RegisterModal() {
       title="Create an account"
       body={<RegisterForm />}
       footer={footerContent}
+      onClose={handleClose}
     />
   );
 }

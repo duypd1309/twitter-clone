@@ -4,20 +4,23 @@ import { formatRelativeTime } from "@/lib/utils";
 import { Comment, Post, User } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { AiOutlineMessage } from "react-icons/ai";
 import LikeButton from "./like-button";
+import { IoClose } from "react-icons/io5";
+import useDeletePostModal from "@/store/useDeletePostModal";
 
 interface PostItemProps {
   data: Post & { user: User } & { comments: Comment[] };
-  isLikedByCurrentUserId: boolean;
+  currentUserId?: string;
 }
 
-export default function PostItem({
-  data,
-  isLikedByCurrentUserId,
-}: PostItemProps) {
+export default function PostItem({ data, currentUserId }: PostItemProps) {
   const router = useRouter();
+  const openDeletePostModal = useDeletePostModal((state) => state.onOpen);
+  const setCurrentPostId = useDeletePostModal(
+    (state) => state.setCurrentPostId
+  );
 
   const goToPost = useCallback(
     (event: React.MouseEvent) => {
@@ -35,6 +38,16 @@ export default function PostItem({
       router.push(`/${data.user.username}`);
     },
     [router, data.user.username]
+  );
+
+  const handleOpenDeletePostModal = useCallback(
+    (event: React.MouseEvent) => {
+      event.stopPropagation();
+
+      setCurrentPostId(data.id);
+      openDeletePostModal();
+    },
+    [setCurrentPostId, data.id, openDeletePostModal]
   );
 
   const createdAt = useMemo(() => {
@@ -60,23 +73,37 @@ export default function PostItem({
           />
         </div>
 
-        <div>
-          <div className="flex flex-row items-center gap-2">
-            <p
-              className="text-white font-semibold cursor:pointer hover:underline"
-              onClick={goToUserProfile}
-            >
-              {data.user.name}
-            </p>
-            <span
-              className="text-neutral-500 hidden md:block cursor:pointer hover:underline"
-              onClick={goToUserProfile}
-            >
-              @{data.user.username}
-            </span>
-            <span className="text-neutral-500 text-sm" suppressHydrationWarning>
-              {createdAt}
-            </span>
+        <div className="w-full">
+          <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row items-center gap-2">
+              <p
+                className="text-white font-semibold cursor:pointer hover:underline"
+                onClick={goToUserProfile}
+              >
+                {data.user.name}
+              </p>
+              <span
+                className="text-neutral-500 hidden md:block cursor:pointer hover:underline"
+                onClick={goToUserProfile}
+              >
+                @{data.user.username}
+              </span>
+              <span
+                className="text-neutral-500 text-sm"
+                suppressHydrationWarning
+              >
+                {createdAt}
+              </span>
+            </div>
+
+            {currentUserId === data.user.id && (
+              <div
+                onClick={handleOpenDeletePostModal}
+                className="text-white hover:opacity-80 transition"
+              >
+                <IoClose size={24} />
+              </div>
+            )}
           </div>
 
           <div className="text-white mt-1">{data.body}</div>
@@ -89,7 +116,9 @@ export default function PostItem({
             <LikeButton
               postId={data.id}
               likeIds={data.likeIds}
-              isLikedByCurrentUserId={isLikedByCurrentUserId}
+              isLikedByCurrentUserId={
+                currentUserId ? data.likeIds.includes(currentUserId) : false
+              }
             />
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { AiOutlineClose } from "react-icons/ai";
 
 export type ModalProps = {
@@ -8,11 +7,16 @@ export type ModalProps = {
   title: string;
   body: React.ReactElement;
   footer?: React.ReactElement;
+  onClose: () => void;
 };
 
-export default function Modal({ isOpen, title, body, footer }: ModalProps) {
-  const router = useRouter();
-
+export default function Modal({
+  isOpen,
+  title,
+  body,
+  footer,
+  onClose,
+}: ModalProps) {
   if (!isOpen) return null;
   return (
     // Modal Backdrop
@@ -25,7 +29,7 @@ export default function Modal({ isOpen, title, body, footer }: ModalProps) {
           <div className="flex justify-between items-center p-10">
             <h3 className="text-3xl font-semibold text-white">{title}</h3>
             <button
-              onClick={() => router.back()}
+              onClick={onClose}
               className="p-1 hover:opacity-70 transition"
             >
               <AiOutlineClose size={20} color="white" />

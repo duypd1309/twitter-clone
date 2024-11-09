@@ -15,13 +15,7 @@ export default async function PostFeed({
     <>
       {posts &&
         posts.map((post) => (
-          <PostItem
-            key={post.id}
-            data={post}
-            isLikedByCurrentUserId={
-              currentUserId ? post.likeIds.includes(currentUserId) : false
-            }
-          />
+          <PostItem key={post.id} data={post} currentUserId={currentUserId} />
         ))}
     </>
   );
