@@ -114,6 +114,8 @@ export async function getFollowers(
       },
     });
 
+    if (!user) return null;
+
     const selectFields =
       includeFields && Object.keys(includeFields).length > 0
         ? includeFields

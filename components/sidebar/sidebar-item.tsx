@@ -1,5 +1,6 @@
 "use client";
 
+import pusherClient from "@/lib/pusher";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ interface SidebarItemProps {
   href: string;
   icon: React.ReactNode;
   hasNotification?: boolean;
+  userId?: string;
 }
 
 export default function SidebarItem({
@@ -17,23 +19,32 @@ export default function SidebarItem({
   href,
   icon,
   hasNotification,
+  userId,
 }: SidebarItemProps) {
-  const [itemHasNotification, setItemHasNotification] =
-    useState(hasNotification);
+  const [hasNewNotification, setHasNewNotification] = useState(hasNotification);
   const pathname = usePathname();
 
   useEffect(() => {
-    setItemHasNotification(hasNotification);
-  }, [hasNotification, setItemHasNotification]);
+    if (!userId) return;
+    const channel = pusherClient.subscribe(`notification-${userId}`);
+
+    channel.bind("new-notification", (data: boolean) => {
+      setHasNewNotification(data);
+    });
+
+    return () => {
+      pusherClient.unsubscribe(`notification-${userId}`);
+    };
+  }, [userId]);
 
   return (
     <Link
-      onClick={() => setItemHasNotification(false)}
+      onClick={() => setHasNewNotification(false)}
       className="relative flex flex-row items-center gap-4 p-4"
       href={href}
     >
       {icon}
-      {itemHasNotification && (
+      {hasNotification && hasNewNotification && (
         <BsDot
           className="text-sky-500 absolute -top-4 left-0"
           size={70}

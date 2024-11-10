@@ -41,6 +41,7 @@ export default async function Sidebar() {
               href={item.href}
               icon={item.icon}
               hasNotification={item.hasNotification || false}
+              userId={session?.userId}
             />
           ))}
           <SidebarSignOutButton />

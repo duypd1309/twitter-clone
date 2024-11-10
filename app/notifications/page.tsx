@@ -15,7 +15,10 @@ export default async function NotificationsPage() {
   return (
     <>
       <Header showBackArror label="Notifications" />
-      <NotificationsFeed notifications={notifications || []} />
+      <NotificationsFeed
+        notifications={notifications || []}
+        userId={currentUserId}
+      />
     </>
   );
 }

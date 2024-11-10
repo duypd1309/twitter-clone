@@ -12,6 +12,15 @@ import prisma from "./db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSession, deleteSession } from "./session";
+import Pusher from "pusher";
+
+const pusherServer = new Pusher({
+  appId: process.env.PUSHER_APP_ID!,
+  key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
+  secret: process.env.PUSHER_SECRET!,
+  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+  useTLS: true,
+});
 
 const SignupFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }).trim(),
@@ -294,6 +303,18 @@ export async function followUser(userId: string) {
     console.log("Failed to create notification.");
   }
 
+  // Trigger notification event
+  try {
+    await pusherServer.trigger(
+      `notification-${userId}`,
+      "new-notification",
+      true
+    );
+    console.log("Notification sent successfully.");
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+
   revalidatePath(`/${username}`);
   return { success: true, message: "Followed user successfully." };
 }
@@ -422,6 +443,18 @@ export async function likePost(postId: string) {
     console.log("Failed to create notification.");
   }
 
+  // Trigger notification event
+  try {
+    await pusherServer.trigger(
+      `notification-${post.userId}`,
+      "new-notification",
+      true
+    );
+    console.log("Notification sent successfully.");
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+
   revalidatePath("/");
   return { success: true, message: "Liked post successfully." };
 }
@@ -522,12 +555,24 @@ export async function createComment(
   try {
     await createNotification(
       "replied to your tweet.",
-      post.user.id,
+      post.userId,
       currentUserId
     );
   } catch (error) {
     console.log(error);
     console.log("Failed to create notification.");
+  }
+
+  // Trigger notification event
+  try {
+    await pusherServer.trigger(
+      `notification-${post.userId}`,
+      "new-notification",
+      true
+    );
+    console.log("Notification sent successfully.");
+  } catch (error) {
+    console.error("Error sending notification:", error);
   }
 
   return { success: true };
@@ -605,4 +650,19 @@ export async function turnOffNotification(userId: string) {
     console.log(error);
     console.log("Failed to update user notification.");
   }
+}
+
+export async function deleteNotifications(userId: string) {
+  try {
+    await prisma.notification.deleteMany({
+      where: {
+        userId,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to delete notifications.");
+  }
+
+  revalidatePath("/notifications");
 }
