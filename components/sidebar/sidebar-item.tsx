@@ -10,6 +10,7 @@ interface SidebarItemProps {
   label: string;
   href: string;
   icon: React.ReactNode;
+  isNotification?: boolean;
   hasNotification?: boolean;
   userId?: string;
 }
@@ -18,6 +19,7 @@ export default function SidebarItem({
   label,
   href,
   icon,
+  isNotification,
   hasNotification,
   userId,
 }: SidebarItemProps) {
@@ -44,7 +46,7 @@ export default function SidebarItem({
       href={href}
     >
       {icon}
-      {hasNotification && hasNewNotification && (
+      {isNotification && hasNewNotification && (
         <BsDot
           className="text-sky-500 absolute -top-4 left-0"
           size={70}

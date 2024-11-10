@@ -19,6 +19,7 @@ export default async function Sidebar() {
       label: "Notifications",
       href: "/notifications",
       icon: <BsBellFill {...iconProps} />,
+      isNotification: true,
       hasNotification: session
         ? !!(await getUserById(session.userId))?.hasNotification
         : false,
@@ -40,6 +41,7 @@ export default async function Sidebar() {
               label={item.label}
               href={item.href}
               icon={item.icon}
+              isNotification={item.isNotification || false}
               hasNotification={item.hasNotification || false}
               userId={session?.userId}
             />
