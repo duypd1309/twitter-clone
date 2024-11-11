@@ -1,5 +1,5 @@
 import Header from "@/components/header";
-import NotificationsFeed from "@/components/notifications/notifications-feed";
+import NotificationsFeed from "@/components/notification/notifications-feed";
 import { turnOffNotification } from "@/lib/actions";
 import { getCurrentSession, getNotifications } from "@/lib/dal";
 
