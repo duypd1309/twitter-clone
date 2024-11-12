@@ -5,6 +5,7 @@ import SidebarItem from "./sidebar-item";
 import { SidebarSignOutButton } from "./sidebar-signout-button";
 import { SidebarTweetButton } from "./sidebar-tweet-button";
 import { getCurrentSession, getUserById } from "@/lib/dal";
+import { IoSearch } from "react-icons/io5";
 
 export default async function Sidebar() {
   const iconProps = { color: "white", size: 24 };
@@ -14,6 +15,11 @@ export default async function Sidebar() {
       label: "Home",
       href: "/",
       icon: <BsHouseFill {...iconProps} />,
+    },
+    {
+      label: "Search",
+      href: "/search",
+      icon: <IoSearch {...iconProps} />,
     },
     {
       label: "Notifications",

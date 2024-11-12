@@ -7,6 +7,7 @@ import {
   getPostById,
   getUserByEmailOrUsername,
   getUserById,
+  getUsersMatchingNameOrUsername,
 } from "./dal";
 import prisma from "./db";
 import { revalidatePath } from "next/cache";
@@ -665,4 +666,22 @@ export async function deleteNotifications(userId: string) {
   }
 
   revalidatePath("/notifications");
+}
+
+export async function searchUsers(
+  searchTerm: string,
+  includeFields: { [key: string]: boolean } = {}
+) {
+  try {
+    const users = await getUsersMatchingNameOrUsername(
+      searchTerm,
+      includeFields
+    );
+
+    if (users) return users;
+    else return null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }

@@ -1,4 +1,5 @@
 import FollowBar from "./follow-bar";
+import Search from "./search";
 import Sidebar from "./sidebar/sidebar";
 
 export default async function MainLayout({
@@ -14,7 +15,10 @@ export default async function MainLayout({
           <div className="col-span-3 lg:col-span-2 border-x-[1px] border-neutral-800">
             {children}
           </div>
-          <FollowBar />
+          <div className="px-4 py-4 hidden lg:flex flex-col gap-6">
+            <Search />
+            <FollowBar />
+          </div>
         </div>
       </div>
     </div>

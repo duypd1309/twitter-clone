@@ -9,3 +9,11 @@
 body {
   @apply h-full bg-black;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3d4144;
+}

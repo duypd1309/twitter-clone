@@ -81,6 +81,43 @@ export async function getUserByEmailOrUsername(
   }
 }
 
+export async function getUsersMatchingNameOrUsername(
+  searchTerm: string,
+  includeFields: { [key: string]: boolean } = {}
+) {
+  try {
+    const selectFields =
+      includeFields && Object.keys(includeFields).length > 0
+        ? includeFields
+        : undefined;
+
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            username: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+          {
+            name: {
+              contains: searchTerm,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      select: selectFields,
+    });
+
+    return users;
+  } catch (error) {
+    console.log("Error finding user:", error);
+    return null;
+  }
+}
+
 export async function getAllUsers(
   includeFields: { [key: string]: boolean } = {}
 ) {

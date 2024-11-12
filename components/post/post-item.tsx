@@ -73,7 +73,7 @@ export default function PostItem({ data, currentUserId }: PostItemProps) {
           />
         </div>
 
-        <div className="w-full">
+        <div className="flex-1">
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-row items-center gap-2">
               <p
