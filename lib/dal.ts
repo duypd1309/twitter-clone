@@ -184,6 +184,7 @@ export async function getPosts(userId?: string) {
         include: {
           user: true,
           comments: true,
+          reposts: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -194,6 +195,7 @@ export async function getPosts(userId?: string) {
         include: {
           user: true,
           comments: true,
+          reposts: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -217,11 +219,73 @@ export async function getPostById(postId: string) {
       include: {
         user: true,
         comments: true,
+        reposts: true,
       },
     });
     return post;
   } catch (error) {
     console.log("Error getting post by id:", error);
+    return null;
+  }
+}
+
+export async function getPostsandRepostsOfUserIds(userIds: string[]) {
+  try {
+    // Get posts and reposts of user including user and comments
+    const posts = await prisma.post.findMany({
+      where: {
+        userId: { in: userIds },
+      },
+      include: {
+        user: true,
+        comments: true,
+        reposts: true,
+      },
+    });
+
+    const reposts = await prisma.repost.findMany({
+      where: {
+        userId: { in: userIds },
+      },
+      include: {
+        post: {
+          include: {
+            user: true,
+            comments: true,
+            reposts: true,
+          },
+        },
+        user: true,
+      },
+    });
+
+    // Format posts and reposts to a unified format (Post type and "isRepost" field for distinguishing between posts and reposts)
+    const formattedPosts = posts.map((post) => ({
+      ...post,
+      repostData: null,
+    }));
+
+    const formattedReposts = reposts.map((repost) => ({
+      ...repost.post,
+      repostData: {
+        repostId: repost.id,
+        repostedAt: repost.createdAt,
+        repostedBy: repost.user.username,
+      },
+    }));
+
+    // Merge posts and reposts into a single array
+    const allPosts = [...formattedPosts, ...formattedReposts];
+
+    const sortedPosts = allPosts.sort((a, b) => {
+      const dateA = a.repostData ? a.repostData.repostedAt : a.createdAt;
+      const dateB = b.repostData ? b.repostData.repostedAt : b.createdAt;
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    return sortedPosts;
+  } catch (error) {
+    console.log("Error getting posts and reposts:", error);
     return null;
   }
 }

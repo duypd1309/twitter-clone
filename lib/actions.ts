@@ -304,18 +304,6 @@ export async function followUser(userId: string) {
     console.log("Failed to create notification.");
   }
 
-  // Trigger notification event
-  try {
-    await pusherServer.trigger(
-      `notification-${userId}`,
-      "new-notification",
-      true
-    );
-    console.log("Notification sent successfully.");
-  } catch (error) {
-    console.error("Error sending notification:", error);
-  }
-
   revalidatePath(`/${username}`);
   return { success: true, message: "Followed user successfully." };
 }
@@ -444,18 +432,6 @@ export async function likePost(postId: string) {
     console.log("Failed to create notification.");
   }
 
-  // Trigger notification event
-  try {
-    await pusherServer.trigger(
-      `notification-${post.userId}`,
-      "new-notification",
-      true
-    );
-    console.log("Notification sent successfully.");
-  } catch (error) {
-    console.error("Error sending notification:", error);
-  }
-
   revalidatePath("/");
   return { success: true, message: "Liked post successfully." };
 }
@@ -564,18 +540,6 @@ export async function createComment(
     console.log("Failed to create notification.");
   }
 
-  // Trigger notification event
-  try {
-    await pusherServer.trigger(
-      `notification-${post.userId}`,
-      "new-notification",
-      true
-    );
-    console.log("Notification sent successfully.");
-  } catch (error) {
-    console.error("Error sending notification:", error);
-  }
-
   return { success: true };
 }
 
@@ -633,7 +597,19 @@ export async function createNotification(
     });
   } catch (error) {
     console.log(error);
-    console.log("Failed to update user notification.");
+    console.log("Failed to update user notification data.");
+  }
+
+  // Trigger notification event
+  try {
+    await pusherServer.trigger(
+      `notification-${userId}`,
+      "new-notification",
+      true
+    );
+    console.log("Notification sent successfully.");
+  } catch (error) {
+    console.error("Error sending notification:", error);
   }
 }
 
@@ -684,4 +660,75 @@ export async function searchUsers(
     console.log(error);
     return null;
   }
+}
+
+export async function repostPost(postId: string) {
+  // Get current user id from session
+  const currentUserId = (await getCurrentSession())?.userId;
+
+  if (!currentUserId) redirect("/login");
+
+  // Save to database
+  try {
+    await prisma.repost.create({
+      data: {
+        postId: postId,
+        userId: currentUserId,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Database Error: Failed to repost post.",
+    };
+  }
+
+  // Get post's user to create notification
+  const post = await getPostById(postId);
+
+  if (!post)
+    return {
+      success: true,
+      message:
+        "Database Error: Reposted successfully but cannot fetch data to create notification.",
+    };
+
+  // Create notification
+  try {
+    await createNotification("retweet your tweet.", post.userId, currentUserId);
+  } catch (error) {
+    console.log(error);
+    console.log("Failed to create notification.");
+  }
+
+  revalidatePath("/");
+  return { success: true, message: "Reposted post successfully." };
+}
+
+export async function unrepostPost(postId: string) {
+  // Get current user id from session
+  const currentUserId = (await getCurrentSession())?.userId;
+
+  if (!currentUserId)
+    return { success: false, message: "Session Error: Cannot verify session." };
+
+  // Save to database
+  try {
+    await prisma.repost.deleteMany({
+      where: {
+        postId: postId,
+        userId: currentUserId,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Database Error: Failed to unrepost post.",
+    };
+  }
+
+  revalidatePath("/");
+  return { success: true, message: "Unreposted post successfully." };
 }

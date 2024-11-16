@@ -1,7 +1,7 @@
 "use client";
 
 import { formatRelativeTime } from "@/lib/utils";
-import { Comment, Post, User } from "@prisma/client";
+import { Comment, Post, Repost, User } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useMemo } from "react";
@@ -9,9 +9,20 @@ import { AiOutlineMessage } from "react-icons/ai";
 import LikeButton from "./like-button";
 import { IoClose } from "react-icons/io5";
 import useDeletePostModal from "@/store/useDeletePostModal";
+import RepostButton from "./repost-buttton";
+import { FaRetweet } from "react-icons/fa6";
 
 interface PostItemProps {
-  data: Post & { user: User } & { comments: Comment[] };
+  data: Post & {
+    user: User;
+    comments: Comment[];
+    reposts: Repost[];
+    repostData?: {
+      repostId: string;
+      repostedAt: Date;
+      repostedBy: string;
+    } | null;
+  };
   currentUserId?: string;
 }
 
@@ -59,6 +70,12 @@ export default function PostItem({ data, currentUserId }: PostItemProps) {
       onClick={goToPost}
       className="border-b-[1px] border-neutral-800 p-5 cursor-pointer hover:bg-neutral-900 transition"
     >
+      {data.repostData && (
+        <div className="flex flex-row items-center text-neutral-500 gap-1 mb-4">
+          <FaRetweet size={20} />
+          <p>Retweeted by {data.repostData.repostedBy}</p>
+        </div>
+      )}
       <div className="flex flex-row items-start gap-3">
         <div onClick={goToUserProfile} className="relative w-10 h-10 mt-1.5">
           <Image
@@ -118,6 +135,17 @@ export default function PostItem({ data, currentUserId }: PostItemProps) {
               likeIds={data.likeIds}
               isLikedByCurrentUserId={
                 currentUserId ? data.likeIds.includes(currentUserId) : false
+              }
+            />
+            <RepostButton
+              postId={data.id}
+              initialRepostCount={data.reposts.length}
+              isRepostedByCurrentUserId={
+                currentUserId
+                  ? data.reposts.some(
+                      (repost) => repost.userId === currentUserId
+                    )
+                  : false
               }
             />
           </div>
