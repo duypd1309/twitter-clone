@@ -51,7 +51,7 @@ export default async function ProfilePage({
         isCurrentUser={session?.userId === user.id}
         isFollowedByCurrentUser={isFollowedByCurrentUser}
       />
-      <PostFeed userId={user.id} currentUserId={session?.userId} />
+      <PostFeed userIds={[user.id]} currentUserId={session?.userId} />
     </>
   );
 }
