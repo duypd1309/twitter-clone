@@ -22,6 +22,7 @@ export default async function FollowBar() {
                 }`}
                 alt="profile image"
                 style={{ objectFit: "cover", borderRadius: "100%" }}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 fill
               />
             </Link>

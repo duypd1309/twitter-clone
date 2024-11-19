@@ -4,6 +4,7 @@ import MainLayout from "@/components/main-layout";
 import React from "react";
 import { DefaultToastOptions, Toaster } from "react-hot-toast";
 import DeletePostModal from "@/components/post/delete-post-modal";
+import ViewImageModal from "@/components/view-image.modal";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <div id="modal">
           {modal}
           <DeletePostModal />
+          <ViewImageModal />
         </div>
         <MainLayout>{children}</MainLayout>
         <Toaster toastOptions={toastOptions} />

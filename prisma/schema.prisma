@@ -38,6 +38,7 @@ model Post {
   body      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  images    String[]
   userId    String   @db.ObjectId
   likeIds   String[] @db.ObjectId
 

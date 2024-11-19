@@ -7,6 +7,7 @@ export type ModalProps = {
   title: string;
   body: React.ReactElement;
   footer?: React.ReactElement;
+  hasBackgroundColor?: boolean;
   onClose: () => void;
 };
 
@@ -15,16 +16,27 @@ export default function Modal({
   title,
   body,
   footer,
+  hasBackgroundColor = true,
   onClose,
 }: ModalProps) {
   if (!isOpen) return null;
   return (
     // Modal Backdrop
-    <div className="fixed inset-0 flex justify-center items-center bg-neutral-800 bg-opacity-70 z-50">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 flex justify-center items-center bg-neutral-800 bg-opacity-70 z-50"
+    >
       {/* Modal Container (Handles modal size and positioning) */}
-      <div className="w-full lg:w-1/2 lg:max-w-xl h-auto max-h-[calc(100vh-5rem)] mx-auto overflow-y-auto">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full lg:w-1/2 lg:max-w-xl h-auto max-h-[calc(100vh-5rem)] mx-auto overflow-y-auto"
+      >
         {/* Modal Content (Actual content of the modal) */}
-        <div className="flex flex-col rounded-lg shadow-lg bg-black">
+        <div
+          className={`flex flex-col rounded-lg shadow-lg${
+            hasBackgroundColor && " bg-black"
+          }`}
+        >
           {/* Modal Header (Title and close button) */}
           <div className="flex justify-between items-center p-10">
             <h3 className="text-3xl font-semibold text-white">{title}</h3>

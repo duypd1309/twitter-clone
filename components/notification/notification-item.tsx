@@ -13,7 +13,7 @@ export default async function NotificationItem({
   const sender = await getUserById(data.senderId);
 
   return (
-    <div className="flex flex-row justify-between items-center p-6 border-b-[1px] border-neutral-800">
+    <div className="flex flex-row justify-between items-center md:p-6 px-2 py-4 border-b-[1px] border-neutral-800">
       <div className="flex flex-row items-center gap-4">
         <div className="relative w-11 h-11">
           <Image

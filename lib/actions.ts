@@ -201,10 +201,11 @@ export async function updateProfile(
 
 export async function createPost(
   userId: string,
+  uploadedFiles: string[] | [],
   prevState: unknown,
   formData: FormData
 ) {
-  // Validate form fields
+  // Validate form fields except files
   const validatedFields = createPostFormSchema.safeParse({
     body: formData.get("body"),
   });
@@ -222,6 +223,7 @@ export async function createPost(
       data: {
         body: validatedFields.data.body,
         userId: userId,
+        images: uploadedFiles,
       },
     });
   } catch (error) {
