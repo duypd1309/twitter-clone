@@ -29,7 +29,7 @@ This is a **Twitter Clone Web Application** using Next.js 15 + TypeScript + Tail
 - **[React Dropzone](https://react-dropzone.js.org/)**: File upload UI in profile update.
 - **[React Icons](https://react-icons.github.io/react-icons/)**: Icon library for UI components.
 
-# 💻️ Development
+## 💻️ Development
 
 1. Clone the repository:
 
